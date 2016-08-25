@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	
+	
+		<!-- 扫描控制器包 -->
+	<!-- @Service用于标注业务层组件、 @Controller用于标注控制层组件、@Repository用于标注数据访问组件，即DAO组件。而@Component泛指组件，当组件不好归类的时候，我们可以使用这个注解进行标注。-->
+	<context:component-scan base-package="com.vnb.spring.service,com.vnb.spring.dao" />
+	
+	<!-- 通过配置的方式，定义bean  -->
+	<bean id="userInfoService" class="com.vnb.spring.service.impl.UserInfoServiceImpl"></bean>
+	<bean id="cardService" class="com.vnb.spring.service.impl.CardServiceImpl"></bean>
+	<bean id="logmsgService" class="com.vnb.spring.service.impl.LogmsgServiceImpl"></bean>
+	<bean id="transferService" class="com.vnb.spring.service.impl.TransferServiceImpl"></bean>
+	<!-- 启用@AspectJ风格的切面声明 --> 
+	<aop:aspectj-autoproxy/> 
+	
+	<!-- 通过配置的方式，定义日志切面bean  -->
+	<bean id="aspetbean" class="com.vnb.interceptor.LogInterceptor"/>
+
+	<aop:config>
+		<aop:aspect id="asp" ref="aspetbean">
+			<!--定义切入点-->  
+			<aop:pointcut id="mycut" expression="execution(* com.vnb.spring.service.**.*(..))" />
+			<!--定义通知（Advice）-->  
+			<aop:before pointcut-ref="mycut" method="doAccessCheck" /> <!-- 前置通知  -->
+			<aop:after-returning pointcut-ref="mycut" method="doAfterReturning" /> <!-- 后置通知  -->
+			<aop:after-throwing pointcut-ref="mycut" method="doAfterThrowing" /> <!-- 例外通知  -->
+			<aop:after pointcut-ref="mycut" method="doAfter" /> <!-- 最后通知  -->
+			<aop:around pointcut-ref="mycut" method="doBasicProfiling" /> <!-- 环绕通知  -->
+		</aop:aspect>
+	</aop:config>
+	
+	
+</beans>
